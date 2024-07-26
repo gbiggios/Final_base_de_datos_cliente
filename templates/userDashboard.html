@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">User Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/members.html">Miembros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/repertorios.html">Repertorios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/ensayos.html">Ensayos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/eventos.html">Eventos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/meetings.html">Reuniones</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center">User Dashboard</h1>
+
+        <div class="form-group">
+            <label for="selectMember">Selecciona un miembro:</label>
+            <select class="form-control" id="selectMember">
+                <!-- Opciones de miembros serán insertadas aquí -->
+            </select>
+        </div>
+
+        <div id="memberInfo" class="mt-5">
+            <h2>Información del Miembro</h2>
+            <div id="memberDetails">
+                <!-- Detalles del miembro serán insertados aquí -->
+            </div>
+            <h3>Asistencia a Ensayos</h3>
+            <div id="memberEnsayos">
+                <!-- Asistencia a ensayos será insertada aquí -->
+            </div>
+            <h3>Eventos</h3>
+            <div id="memberEventos">
+                <!-- Eventos serán insertados aquí -->
+            </div>
+            <h3>Repertorios y Partituras</h3>
+            <div id="memberRepertorios">
+                <!-- Repertorios y partituras serán insertados aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let members = [];
+
+            function loadMembers() {
+                axios.get('http://localhost:5000/members')
+                    .then(response => {
+                        members = response.data.members;
+                        const selectMember = $('#selectMember');
+                        selectMember.empty();
+                        members.forEach(member => {
+                            selectMember.append(new Option(`${member.nombre} ${member.apellidoPaterno} ${member.apellidoMaterno}`, member._id));
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los miembros:', error);
+                    });
+            }
+
+            function loadMemberDetails(memberId) {
+                axios.get(`http://localhost:5000/members/${memberId}`)
+                    .then(response => {
+                        const member = response.data;
+                        $('#memberDetails').html(`
+                            <p><strong>Nombre:</strong> ${member.nombre} ${member.apellidoPaterno} ${member.apellidoMaterno}</p>
+                            <p><strong>Instrumento:</strong> ${member.instrumento}</p>
+                            <p><strong>Correo:</strong> ${member.correo}</p>
+                            <p><strong>Contacto:</strong> ${member.contacto}</p>
+                        `);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los detalles del miembro:', error);
+                    });
+            }
+
+            function loadMemberEnsayos(memberId) {
+                axios.get('http://localhost:5000/ensayos')
+                    .then(response => {
+                        const ensayos = response.data.filter(ensayo => 
+                            ensayo.asistencia.some(a => a.miembroID === memberId)
+                        );
+                        const ensayosList = ensayos.map(ensayo => {
+                            const asistencia = ensayo.asistencia.find(a => a.miembroID === memberId);
+                            return `<p>${new Date(ensayo.fecha).toLocaleDateString()} - ${ensayo.objetivo} - ${ensayo.tipo} - ${asistencia && asistencia.presente ? 'Asistió' : 'No asistió'}</p>`;
+                        }).join('');
+                        $('#memberEnsayos').html(ensayosList);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los ensayos del miembro:', error);
+                    });
+            }
+
+            function loadMemberEventos(memberId) {
+                axios.get('http://localhost:5000/eventos')
+                    .then(response => {
+                        const eventos = response.data.eventos; // Ajusta esto según tu estructura de datos
+                        const eventosList = eventos.map(evento => `
+                            <p>${new Date(evento.fecha).toLocaleDateString()} - ${evento.nombre}</p>
+                        `).join('');
+                        $('#memberEventos').html(eventosList);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los eventos del miembro:', error);
+                    });
+            }
+
+            function loadMemberRepertorios(memberId) {
+                axios.get('http://localhost:5000/repertorios')
+                    .then(response => {
+                        const repertorios = response.data; // Ajusta esto según tu estructura de datos
+                        const repertoriosList = repertorios.map(repertorio => `
+                            <p>${repertorio.nombre} - <a href="http://localhost:5000/uploads/${repertorio.partitura}" target="_blank">Ver Partitura</a></p>
+                        `).join('');
+                        $('#memberRepertorios').html(repertoriosList);
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar los repertorios del miembro:', error);
+                    });
+            }
+
+            $('#selectMember').change(function() {
+                const memberId = $(this).val();
+                if (memberId) {
+                    loadMemberDetails(memberId);
+                    loadMemberEnsayos(memberId);
+                    loadMemberEventos(memberId);
+                    loadMemberRepertorios(memberId);
+                } else {
+                    $('#memberDetails').empty();
+                    $('#memberEnsayos').empty();
+                    $('#memberEventos').empty();
+                    $('#memberRepertorios').empty();
+                }
+            });
+
+            loadMembers();
+        });
+    </script>
+</body>
+</html>

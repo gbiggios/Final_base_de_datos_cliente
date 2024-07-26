@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Reuniones</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Orquesta</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/members.html">Miembros</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/ensayos.html">Ensayos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/repertorios.html">Repertorios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/eventos.html">Eventos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/templates/meetings.html">Reuniones</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Gestión de Reuniones</h1>
+
+        <!-- Botón para abrir modal de creación -->
+        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#createMeetingModal">Crear Reunión</button>
+
+        <!-- Tabla para mostrar reuniones -->
+        <div class="card mt-4">
+            <div class="card-header">Lista de Reuniones</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Comité</th>
+                            <th>Temas Discutidos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="meetingsTableBody">
+                        <!-- Aquí se insertarán las filas de las reuniones -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Crear Reunión -->
+    <div class="modal fade" id="createMeetingModal" tabindex="-1" aria-labelledby="createMeetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createMeetingModalLabel">Crear Reunión</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="createMeetingForm">
+                        <div class="form-group">
+                            <label for="fecha">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="comite">Comité</label>
+                            <input type="text" class="form-control" id="comite" name="comite" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="acta">Acta</label>
+                            <input type="text" class="form-control" id="acta" name="acta" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="temasDiscutidos">Temas Discutidos</label>
+                            <input type="text" class="form-control" id="temasDiscutidos" name="temasDiscutidos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="miembros">Miembros</label>
+                            <select multiple class="form-control" id="miembros">
+                                <!-- Opciones de miembros serán insertadas aquí -->
+                            </select>
+                        </div>
+                        <ul id="selectedMiembros" class="list-group mt-3"></ul>
+                        <button type="submit" class="btn btn-primary mt-3">Crear Reunión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Reunión -->
+    <div class="modal fade" id="editMeetingModal" tabindex="-1" aria-labelledby="editMeetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMeetingModalLabel">Editar Reunión</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMeetingForm">
+                        <div class="form-group">
+                            <label for="editFecha">Fecha</label>
+                            <input type="date" class="form-control" id="editFecha" name="fecha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editComite">Comité</label>
+                            <input type="text" class="form-control" id="editComite" name="comite" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editActa">Acta</label>
+                            <input type="text" class="form-control" id="editActa" name="acta" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editTemasDiscutidos">Temas Discutidos</label>
+                            <input type="text" class="form-control" id="editTemasDiscutidos" name="temasDiscutidos" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMiembros">Miembros</label>
+                            <select multiple class="form-control" id="editMiembros">
+                                <!-- Opciones de miembros serán insertadas aquí -->
+                            </select>
+                        </div>
+                        <ul id="selectedEditMiembros" class="list-group mt-3"></ul>
+                        <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Detalles de Reunión -->
+    <div class="modal fade" id="viewMeetingModal" tabindex="-1" aria-labelledby="viewMeetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewMeetingModalLabel">Detalles de Reunión</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <strong>Fecha:</strong> <span id="viewFecha"></span>
+                    </div>
+                    <div>
+                        <strong>Comité:</strong> <span id="viewComite"></span>
+                    </div>
+                    <div>
+                        <strong>Acta:</strong> <span id="viewActa"></span>
+                    </div>
+                    <div>
+                        <strong>Temas Discutidos:</strong> <span id="viewTemasDiscutidos"></span>
+                    </div>
+                    <div>
+                        <strong>Participantes:</strong>
+                        <ul id="viewParticipantes" class="list-group mt-2"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentMeetingId = null;
+            let members = [];
+
+            function getMembers() {
+                return axios.get('http://localhost:5000/members')
+                    .then(response => {
+                        members = response.data.members;
+                        renderMemberOptions();
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener miembros:', error);
+                    });
+            }
+
+            function renderMemberOptions() {
+                const selectCreate = document.querySelector('#miembros');
+                const selectEdit = document.querySelector('#editMiembros');
+                selectCreate.innerHTML = '';
+                selectEdit.innerHTML = '';
+                members.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member._id;
+                    option.textContent = `${member.nombre} ${member.apellidoPaterno} ${member.apellidoMaterno}`;
+                    selectCreate.appendChild(option);
+                    selectEdit.appendChild(option.cloneNode(true));
+                });
+            }
+
+            function getMeetings() {
+                axios.get('http://localhost:5000/meetings')
+                    .then(response => {
+                        const meetings = response.data.meetings;
+                        mostrarMeetings(meetings);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener reuniones:', error);
+                    });
+            }
+
+            function mostrarMeetings(meetings) {
+                const tbody = document.querySelector('#meetingsTableBody');
+                tbody.innerHTML = '';
+                meetings.forEach(meeting => {
+                    const participantesList = meeting.participantes.map(p => {
+                        const member = members.find(m => m._id === p.miembroID);
+                        return member ? `${member.nombre} ${member.apellidoPaterno} ${member.apellidoMaterno}` : p.miembroID;
+                    }).join(', ');
+                    const temasDiscutidosList = meeting.temas_discutidos.join(', ');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${new Date(meeting.fecha).toLocaleDateString()}</td>
+                        <td>${meeting.comite}</td>
+                        <td>${temasDiscutidosList}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm editBtn" data-id="${meeting._id}">Editar</button>
+                            <button class="btn btn-danger btn-sm deleteBtn" data-id="${meeting._id}">Eliminar</button>
+                            <button class="btn btn-info btn-sm viewBtn" data-id="${meeting._id}">Ver Detalles</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.querySelectorAll('.editBtn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        currentMeetingId = this.getAttribute('data-id');
+                        editarMeeting(currentMeetingId);
+                    });
+                });
+
+                document.querySelectorAll('.deleteBtn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const meetingId = this.getAttribute('data-id');
+                        eliminarMeeting(meetingId);
+                    });
+                });
+
+                document.querySelectorAll('.viewBtn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const meetingId = this.getAttribute('data-id');
+                        verDetallesMeeting(meetingId);
+                    });
+                });
+            }
+
+            function crearMeeting(event) {
+                event.preventDefault();
+                const newMeeting = {
+                    fecha: document.querySelector('#fecha').value,
+                    comite: document.querySelector('#comite').value,
+                    acta: document.querySelector('#acta').value,
+                    temas_discutidos: document.querySelector('#temasDiscutidos').value.split(','),
+                    participantes: Array.from(document.querySelectorAll('#selectedMiembros li')).map(li => ({
+                        miembroID: li.dataset.id,
+                        presente: true // Suponiendo que los miembros seleccionados están presentes
+                    }))
+                };
+
+                axios.post('http://localhost:5000/meetings/create', newMeeting)
+                    .then(response => {
+                        $('#createMeetingModal').modal('hide');
+                        getMeetings();
+                    })
+                    .catch(error => {
+                        console.error('Error al crear reunión:', error);
+                    });
+            }
+
+            function editarMeeting(id) {
+                axios.get(`http://localhost:5000/meetings/${id}`)
+                    .then(response => {
+                        const meeting = response.data;
+                        document.querySelector('#editFecha').value = meeting.fecha.split('T')[0];
+                        document.querySelector('#editComite').value = meeting.comite;
+                        document.querySelector('#editActa').value = meeting.acta;
+                        document.querySelector('#editTemasDiscutidos').value = meeting.temas_discutidos.join(',');
+
+                        const selectedEditMiembrosList = document.querySelector('#selectedEditMiembros');
+                        selectedEditMiembrosList.innerHTML = '';
+                        meeting.participantes.forEach(participante => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item';
+                            const member = members.find(m => m._id === participante.miembroID);
+                            li.textContent = member ? `${member.nombre} ${member.apellidoPaterno} ${member.apellidoMaterno}` : participante.miembroID;
+                            li.dataset.id = participante.miembroID;
+                            selectedEditMiembrosList.appendChild(li);
+                        });
+
+                        $('#editMeetingModal').modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener reunión:', error);
+                    });
+            }
+
+            function actualizarMeeting(event) {
+                event.preventDefault();
+                const updatedMeeting = {
+                    fecha: document.querySelector('#editFecha').value,
+                    comite: document.querySelector('#editComite').value,
+                    acta: document.querySelector('#editActa').value,
+                    temas_discutidos: document.querySelector('#editTemasDiscutidos').value.split(','),
+                    participantes: Array.from(document.querySelectorAll('#selectedEditMiembros li')).map(li => ({
+                        miembroID: li.dataset.id,
+                        presente: true // Suponiendo que los miembros seleccionados están presentes
+                    }))
+                };
+
+                axios.put(`http://localhost:5000/meetings/update/${currentMeetingId}`, updatedMeeting)
+                    .then(response => {
+                        $('#editMeetingModal').modal('hide');
+                        getMeetings();
+                    })
+                    .catch(error => {
+                        console.error('Error al actualizar reunión:', error);
+                    });
+            }
+
+            function eliminarMeeting(id) {
+                axios.delete(`http://localhost:5000/meetings/delete?id=${id}`)
+                    .then(response => {
+                        getMeetings();
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar reunión:', error);
+                    });
+            }
+
+            function verDetallesMeeting(id) {
+                axios.get(`http://localhost:5000/meetings/${id}`)
+                    .then(response => {
+                        const meeting = response.data;
+                        document.querySelector('#viewFecha').textContent = new Date(meeting.fecha).toLocaleDateString();
+                        document.querySelector('#viewComite').textContent = meeting.comite;
+                        document.querySelector('#viewActa').textContent = meeting.acta;
+                        document.querySelector('#viewTemasDiscutidos').textContent = meeting.temas_discutidos.join(', ');
+
+                        const viewParticipantesList = document.querySelector('#viewParticipantes');
+                        viewParticipantesList.innerHTML = '';
+                        meeting.participantes.forEach(participante => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item';
+                            const member = members.find(m => m._id === participante.miembroID);
+                            li.textContent = member ? `${member.nombre} ${member.apellidoPaterno} ${member.apellidoMaterno}` : participante.miembroID;
+                            viewParticipantesList.appendChild(li);
+                        });
+
+                        $('#viewMeetingModal').modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener detalles de la reunión:', error);
+                    });
+            }
+
+            function moveSelectedOptions(sourceSelectId, targetUlId) {
+                const select = document.querySelector(sourceSelectId);
+                const selectedOptions = Array.from(select.selectedOptions);
+                const targetUl = document.querySelector(targetUlId);
+                selectedOptions.forEach(option => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = option.textContent;
+                    li.dataset.id = option.value;
+                    targetUl.appendChild(li);
+                    option.remove();
+                });
+            }
+
+            document.querySelector('#createMeetingForm').addEventListener('submit', crearMeeting);
+            document.querySelector('#editMeetingForm').addEventListener('submit', actualizarMeeting);
+
+            document.querySelector('#miembros').addEventListener('change', function() {
+                moveSelectedOptions('#miembros', '#selectedMiembros');
+            });
+
+            document.querySelector('#editMiembros').addEventListener('change', function() {
+                moveSelectedOptions('#editMiembros', '#selectedEditMiembros');
+            });
+
+            getMembers().then(getMeetings);
+        });
+    </script>
+</body>
+</html>
